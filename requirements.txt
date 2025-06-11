@@ -1,7 +1,4 @@
-fastapi
-uvicorn
 beautifulsoup4
-lxml
-pytesseract
-Pillow
-openai
+markdownify
+playwright
+requests
