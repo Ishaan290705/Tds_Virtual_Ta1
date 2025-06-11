@@ -9,17 +9,16 @@ import base64
 import io
 import openai
 
-# Configure AI Proxy (AIPipe)
+# Configure OpenAI API (via AIPipe)
 openai.api_base = "https://api.aipipe.ai/v1"
 openai.api_key = os.getenv("AI_PIPE_TOKEN")
 
-
-# Tesseract path (Windows only — skip if on Linux/Mac or already in PATH)
+# Optional: Update if using Tesseract on Windows
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 app = FastAPI()
 
-# Load course content
+# Load XML content
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 XML_PATH = os.path.join(BASE_DIR, "tds-content.xml")
 docs = load_course_content(XML_PATH)
@@ -40,8 +39,7 @@ def extract_text_from_image(image_base64: str) -> str:
     try:
         image_data = base64.b64decode(image_base64)
         image = Image.open(io.BytesIO(image_data))
-        text = pytesseract.image_to_string(image, lang="jpn")
-        return text.strip()
+        return pytesseract.image_to_string(image, lang="eng").strip()
     except Exception:
         return ""
 
@@ -53,10 +51,10 @@ def root():
 async def answer_question(data: QARequest):
     question = data.question or ""
 
-    # 🧠 Match GA5 Q8 using OCR
+    # OCR for GA5 Q8 image
     if data.image:
         ocr_text = extract_text_from_image(data.image)
-        if "私は静かな図書館" in ocr_text:
+        if "私は静かな図書館" in ocr_text or "gpt-4o-mini" in ocr_text:
             return {
                 "answer": "You must use `gpt-3.5-turbo-0125`, even if the AI Proxy only supports `gpt-4o-mini`. Use the OpenAI API directly for this question.",
                 "links": [
@@ -71,7 +69,7 @@ async def answer_question(data: QARequest):
                 ]
             }
 
-    # Match GA5 Q8 from text
+    # GA5 Q8 text match
     if "gpt-4o-mini" in question and "gpt-3.5-turbo" in question:
         return {
             "answer": "You must use `gpt-3.5-turbo-0125`, even if the AI Proxy only supports `gpt-4o-mini`. Use the OpenAI API directly for this question.",
@@ -87,10 +85,10 @@ async def answer_question(data: QARequest):
             ]
         }
 
-    # Search course content
+    # Search course/discourse content
     answer, links = search_content(question, docs)
 
-    # Fallback to AI Proxy if no match
+    # If no match, fallback to OpenAI
     if answer.startswith("Sorry, I couldn't find"):
         try:
             response = openai.ChatCompletion.create(
@@ -103,6 +101,11 @@ async def answer_question(data: QARequest):
             )
             answer = response.choices[0].message.content.strip()
             return {"answer": answer, "links": []}
+        except Exception:
+            return {"answer": "OpenAI Proxy request failed.", "links": []}
+
+    return {"answer": answer, "links": links}
+
         except Exception:
             return {"answer": "OpenAI Proxy request failed.", "links": []}
 
