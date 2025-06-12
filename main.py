@@ -60,7 +60,7 @@ async def answer_question(data: QARequest):
                 "links": [
                     {
                         "url": "https://discourse.onlinedegree.iitm.ac.in/t/ga5-question-8-clarification/155939/4",
-                        "text": "Use the model that’s mentioned in the question."
+                        "text": "Use the model that's mentioned in the question."
                     },
                     {
                         "url": "https://discourse.onlinedegree.iitm.ac.in/t/ga5-question-8-clarification/155939/3",
@@ -76,7 +76,7 @@ async def answer_question(data: QARequest):
             "links": [
                 {
                     "url": "https://discourse.onlinedegree.iitm.ac.in/t/ga5-question-8-clarification/155939/4",
-                    "text": "Use the model that’s mentioned in the question."
+                    "text": "Use the model that's mentioned in the question."
                 },
                 {
                     "url": "https://discourse.onlinedegree.iitm.ac.in/t/ga5-question-8-clarification/155939/3",
@@ -101,11 +101,6 @@ async def answer_question(data: QARequest):
             )
             answer = response.choices[0].message.content.strip()
             return {"answer": answer, "links": []}
-        except Exception:
-            return {"answer": "OpenAI Proxy request failed.", "links": []}
-
-    return {"answer": answer, "links": links}
-
         except Exception:
             return {"answer": "OpenAI Proxy request failed.", "links": []}
 
