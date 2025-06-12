@@ -1,8 +1,12 @@
 fastapi
-beautifulsoup4
-markdownify
-playwright
-requests
 uvicorn
-pytesseract
-python-multipart  # Needed for file uploads
+python-dotenv
+aiohttp
+numpy
+pydantic
+beautifulsoup4
+html2text
+tqdm
+markdown
+python-multipart
+setuptools
