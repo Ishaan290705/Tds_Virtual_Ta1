@@ -1,5 +1,8 @@
+fastapi
 beautifulsoup4
 markdownify
 playwright
 requests
 uvicorn
+pytesseract
+python-multipart  # Needed for file uploads
